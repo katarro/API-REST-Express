@@ -1,26 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const CategoriesServices = require("../services/categories");
+const service = new CategoriesServices();
 
 // Método GET de categories
 router.get('/', (req, res) => {
-  const { categoryId } = req.params;
-  res.json([
-    {
-      categoryId,
-      category: 'Terror',
-      movies: ['La llorona', 'El cuco', 'La novia fe'],
-    },
-    {
-      categoryId,
-      category: 'Accion',
-      movies: ['Carito vs Pipe', 'Aliens vs depredador', 'Matrix'],
-    },
-    {
-      categoryId,
-      category: 'Suspenso',
-      movies: ['El viejo del saco', 'Los fantasmas', 'El fantasma de la novia'],
-    },
-  ]);
+
+  const categories = service.find();
+  res.json(categories)
+
 });
 
 //Método GET de Movies

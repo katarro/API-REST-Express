@@ -1,74 +1,54 @@
 const express = require('express');
 const router = express.Router();
+const UsersService = require('../services/users');
+const service = new UsersService();
 
 // GET: PARAMETROS query (DINAMICOS)
 router.get('/', (req, res) => {
   // limit y offset son OPCIONALES
   const { limit, offset } = req.query;
-  // Se hace la validacion, porque son opcionales
-  if (limit && offset) {
-    res.json({
-      limit,
-      offset,
-    });
-  } else {
-    // Que los muestre todos
-    res.json([
-      {
-        name: 'Felipe',
-        age: 23,
-      },
-      {
-        name: 'Carito',
-        age: 21,
-      },
-    ]);
-  }
+  const users = service.find(limit, offset);
+  res.json(users);
 });
 
+// Método GET
+router.get('/:id', (req, res) => {
+  const { id } = req.params;
+  const user = service.finOne(id);
+  res.json(user);
+});
 
 // Método POST
-router.post("/", (req,res) =>{
+router.post('/', (req, res) => {
   const body = req.body;
 
-  res.json({
-    message:"Created",
-    body
-  })
-})
+  const NewUser = service.create(body);
+  res.status(201).json(NewUser);
+});
 
 // Método DELETE
-router.delete("/:id", (req,res) =>{
-
-  const {id} = req.params;
-
-  res.json({
-    message:"Deleted",
-    id
-
-  })
-})
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  service.delete(id);
+  const user = service.finOne(id);
+  res.json(user);
+});
 
 // Método PUT
-router.put("/:id", (req,res) => {
+router.put('/:id', (req, res) => {
+  const { id } = req.params;
   const body = req.body;
-  const {id} = req.params;
-  res.json({
-    message:"Updated",
-    body,
-    id
-  })
-})
+  const user = service.update(id, body);
+  res.json(user);
+});
 
 //Método PATCH
-router.patch("/:id", (req,res) =>{
-  const {id} = req.params;
+router.patch('/:id', (req, res) => {
+  const { id } = req.params;
   const body = req.body;
+  const user = service.update(id, body);
 
-  res.json({
-    body,
-    id
-  })
-})
+  res.status(201).json(user);
+});
 
 module.exports = router;
