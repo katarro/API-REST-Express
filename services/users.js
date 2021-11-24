@@ -6,7 +6,7 @@ class UsersService {
     this.generate(); // Iniciamos altiro
   }
   generate() {
-    const limit = 3;
+    const limit = 50;
     //Estamos agregando users random para probar
     for (let index = 0; index < limit; index++) {
       this.users.push({
