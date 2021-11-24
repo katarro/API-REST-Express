@@ -4,60 +4,49 @@ const services = new ProdcutService();
 const router = express.Router();
 
 // Método GET
-router.get('/', (req, res) => {
-  const products = services.find();
-  res.json(products);
+router.get('/', async (req, res) => {
+  const products = await services.find();
+  res.status(201).json(products);
 });
 
 // Los EndPoints especificos deben ir antes que los dinamicos (query), para evitar choques de rutas.
 // Método GET
-router.get('/:id', (req, res) => {
-  const { id } = req.params; // DESESTRUCTURACION
-  const product = services.findOne(id); // Busca el id dentro del array de productos y devuelve el producto
-  res.json(product);
+router.get('/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params; // DESESTRUCTURACION
+    const product = await services.findOne(id); // Busca el id dentro del array de productos y devuelve el producto
+    res.json(product);
+  } catch (error) {
+    next(error)
+  }
 });
 
 // Envío Metodo POST
-router.post('/', (req, res) => {
-  //Captura el contenido del POST
+router.post('/', async (req, res) => {
   const body = req.body;
-  res.status(201).json({
-    message: 'crated',
-    data: body,
-  });
-});
 
-//Envío Método PUT
-router.put('/:id', (req, res) => {
-  //Captura el contenido del POST
-  const body = req.body;
-  const { id } = req.params;
-  res.json({
-    message: 'updated',
-    data: body,
-    id,
-  });
+  const newProduct = await services.create(body);
+  res.status(201).json(newProduct);
 });
 
 //Envío Método PATCH
-router.patch('/:id', (req, res) => {
+router.patch('/:id', async (req, res,next) => {
   //Captura el contenido del POST
-  const body = req.body;
-  const { id } = req.params;
-  res.json({
-    message: 'updated',
-    data: body,
-    id,
-  });
+  try {
+    const body = req.body;
+    const { id } = req.params;
+    const productUpdated = await services.update(id, body);
+    res.status(201).json(productUpdated);
+  } catch (error) {
+    next(error)
+  }
 });
 
 //Envío Método DELETE
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
-  res.json({
-    message: 'deleted',
-    id,
-  });
+  const deleted = await services.delete(id);
+  res.status(201).json(deleted);
 });
 
 module.exports = router;
