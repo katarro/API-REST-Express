@@ -10,7 +10,6 @@ const {
   boomErrorHandler,
 } = require('./middlewares/error.handler');
 
-
 app.use(cors()); // Habilitamos a cualquier dominio a consumir la API
 
 // Sirve para recibir informacion json, que nos envian por POST
