@@ -1,5 +1,11 @@
 const express = require('express');
 const ProdcutService = require('../services/products');
+const validatorHandler = require('../middlewares/validator.handler');
+const {
+  createProductSchema,
+  updateProductSchema,
+  getProductSchema,
+} = require('../schemas/products');
 const services = new ProdcutService();
 const router = express.Router();
 
@@ -11,36 +17,49 @@ router.get('/', async (req, res) => {
 
 // Los EndPoints especificos deben ir antes que los dinamicos (query), para evitar choques de rutas.
 // Método GET
-router.get('/:id', async (req, res, next) => {
-  try {
-    const { id } = req.params; // DESESTRUCTURACION
-    const product = await services.findOne(id); // Busca el id dentro del array de productos y devuelve el producto
-    res.json(product);
-  } catch (error) {
-    next(error)
+router.get(
+  '/:id',
+  validatorHandler(getProductSchema, 'params'), // hace la validacion del GET
+  async (req, res, next) => {
+    try {
+      const { id } = req.params; // DESESTRUCTURACION
+      const product = await services.findOne(id); // Busca el id dentro del array de productos y devuelve el producto
+      res.json(product);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 // Envío Metodo POST
-router.post('/', async (req, res) => {
-  const body = req.body;
+router.post(
+  '/',
+  validatorHandler(createProductSchema, 'body'),
+  async (req, res) => {
+    const body = req.body;
 
-  const newProduct = await services.create(body);
-  res.status(201).json(newProduct);
-});
+    const newProduct = await services.create(body);
+    res.status(201).json(newProduct);
+  }
+);
 
 //Envío Método PATCH
-router.patch('/:id', async (req, res,next) => {
-  //Captura el contenido del POST
-  try {
-    const body = req.body;
-    const { id } = req.params;
-    const productUpdated = await services.update(id, body);
-    res.status(201).json(productUpdated);
-  } catch (error) {
-    next(error)
+router.patch(
+  '/:id',
+  validatorHandler(getProductSchema, 'params'),// se valida el id
+  validatorHandler(updateProductSchema, 'body'),// Se valida el contenido
+  async (req, res, next) => {
+    //Captura el contenido del POST
+    try {
+      const body = req.body;
+      const { id } = req.params;
+      const productUpdated = await services.update(id, body);
+      res.status(201).json(productUpdated);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 //Envío Método DELETE
 router.delete('/:id', async (req, res) => {
